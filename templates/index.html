@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Retinex Vision | Low-Light Enhancement
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <span class="logo-symbol">◈</span>
+
+        RETINEX<span>VISION</span>
+
+    </div>
+
+
+    <div class="nav-label">
+        LOW-LIGHT IMAGE ENHANCEMENT
+    </div>
+
+</nav>
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="badge">
+            SSR • MSR • RETINEX PROCESSING
+        </div>
+
+
+        <h1>
+
+            Bring light back to
+
+            <span>
+                the shadows.
+            </span>
+
+        </h1>
+
+
+        <p>
+
+            Enhance dark and poorly illuminated images
+            using Single-Scale Retinex and
+            Multi-Scale Retinex.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<main>
+
+
+<section class="upload-section">
+
+
+    <div class="section-heading">
+
+        <span class="section-number">
+            01
+        </span>
+
+
+        <div>
+
+            <h2>
+                Upload your image
+            </h2>
+
+            <p>
+                Choose a low-light image to begin enhancement.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        action="/enhance"
+        method="POST"
+        enctype="multipart/form-data"
+        id="uploadForm"
+    >
+
+
+        <div class="method-selector">
+
+            <div class="method-selector-title">
+                ENHANCEMENT METHOD
+            </div>
+
+
+            <div class="method-options">
+
+
+                <label class="method-option active">
+
+                    <input
+                        type="radio"
+                        name="method"
+                        value="MSR"
+                        checked
+                    >
+
+                    <div class="method-content">
+
+                        <span class="method-name">
+                            MSR
+                        </span>
+
+                        <span class="method-description">
+                            Multi-Scale Retinex
+                        </span>
+
+                    </div>
+
+                </label>
+
+
+                <label class="method-option">
+
+                    <input
+                        type="radio"
+                        name="method"
+                        value="SSR"
+                    >
+
+                    <div class="method-content">
+
+                        <span class="method-name">
+                            SSR
+                        </span>
+
+                        <span class="method-description">
+                            Single-Scale Retinex
+                        </span>
+
+                    </div>
+
+                </label>
+
+
+            </div>
+
+        </div>
+
+
+        <label
+            class="drop-zone"
+            id="dropZone"
+        >
+
+            <input
+                type="file"
+                name="image"
+                id="imageInput"
+                accept="image/*"
+                required
+            >
+
+
+            <div class="upload-icon">
+                ↑
+            </div>
+
+
+            <h3>
+                Drop your image here
+            </h3>
+
+
+            <p>
+                or
+                <strong>
+                    browse from your computer
+                </strong>
+            </p>
+
+
+            <span class="file-types">
+                JPG • JPEG • PNG • WEBP
+            </span>
+
+        </label>
+
+
+        <div
+            class="preview-container"
+            id="previewContainer"
+        >
+
+            <img
+                id="previewImage"
+                alt="Image preview"
+            >
+
+
+            <div class="preview-info">
+
+                <span id="fileName">
+                    Selected image
+                </span>
+
+
+                <button
+                    type="button"
+                    id="removeImage"
+                >
+                    Remove
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="enhance-button"
+            id="enhanceButton"
+        >
+
+            <span>
+                Enhance Image
+            </span>
+
+            <span class="button-arrow">
+                →
+            </span>
+
+        </button>
+
+
+    </form>
+
+
+    {% if error %}
+
+    <div class="error-message">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+</section>
+
+
+{% if original_image %}
+
+
+<section class="results-section">
+
+
+    <div class="section-heading">
+
+        <span class="section-number">
+            02
+        </span>
+
+
+        <div>
+
+            <h2>
+                Enhancement results
+            </h2>
+
+
+            <p>
+                Processed using
+                <strong>{{ method }}</strong>
+                Retinex.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- BEFORE / AFTER -->
+
+    <div class="comparison-wrapper">
+
+
+        <div class="comparison-header">
+
+            <span>
+                BEFORE · LOW LIGHT
+            </span>
+
+
+            <span>
+                AFTER · {{ method }}
+            </span>
+
+        </div>
+
+
+        <div
+            class="comparison-slider"
+            id="comparisonSlider"
+        >
+
+
+            <img
+                class="comparison-image after-image"
+                src="{{ enhanced_image }}"
+                alt="Enhanced image"
+            >
+
+
+            <div
+                class="before-image-container"
+                id="beforeImageContainer"
+            >
+
+                <img
+                    class="comparison-image"
+                    src="{{ original_image }}"
+                    alt="Original image"
+                >
+
+            </div>
+
+
+            <div
+                class="slider-line"
+                id="sliderLine"
+            ></div>
+
+
+            <div
+                class="slider-handle"
+                id="sliderHandle"
+            >
+                ↔
+            </div>
+
+
+        </div>
+
+
+        <p class="slider-hint">
+
+            Drag the slider to compare the
+            original and enhanced image.
+
+        </p>
+
+    </div>
+
+
+    <!-- INTERMEDIATE RESULTS -->
+
+    <div class="sub-results">
+
+
+        <div class="result-card">
+
+            <div class="small-card-header">
+
+                <span>
+                    RETINEX STEP 01
+                </span>
+
+                <span>
+                    Illumination Map
+                </span>
+
+            </div>
+
+
+            <div class="result-image-box">
+
+                <img
+                    src="{{ illumination_image }}"
+                    alt="Illumination map"
+                >
+
+            </div>
+
+
+            <p>
+                Estimated illumination distribution
+                of the input scene.
+            </p>
+
+        </div>
+
+
+        <div class="result-card">
+
+            <div class="small-card-header">
+
+                <span>
+                    RETINEX STEP 02
+                </span>
+
+                <span>
+                    {{ method }} Response
+                </span>
+
+            </div>
+
+
+            <div class="result-image-box">
+
+                <img
+                    src="{{ response_image }}"
+                    alt="Retinex response"
+                >
+
+            </div>
+
+
+            <p>
+                Retinex log-domain response showing
+                local illumination correction.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- IMAGE ANALYSIS -->
+
+    <div class="analysis-section">
+
+
+        <div class="analysis-title">
+
+            <span class="section-number">
+                03
+            </span>
+
+
+            <div>
+
+                <h2>
+                    Image analysis
+                </h2>
+
+
+                <p>
+                    Quantitative comparison before
+                    and after enhancement.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="metrics-grid">
+
+
+            <div class="metric-card">
+
+                <span class="metric-name">
+                    BRIGHTNESS
+                </span>
+
+
+                <div class="metric-values">
+
+                    <strong>
+                        {{ brightness_before }}
+                    </strong>
+
+                    <span>
+                        →
+                    </span>
+
+                    <strong class="after">
+                        {{ brightness_after }}
+                    </strong>
+
+                </div>
+
+
+                <small>
+                    Before → After
+                </small>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <span class="metric-name">
+                    CONTRAST
+                </span>
+
+
+                <div class="metric-values">
+
+                    <strong>
+                        {{ contrast_before }}
+                    </strong>
+
+                    <span>
+                        →
+                    </span>
+
+                    <strong class="after">
+                        {{ contrast_after }}
+                    </strong>
+
+                </div>
+
+
+                <small>
+                    {{ contrast_change }}% change
+                </small>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <span class="metric-name">
+                    ENTROPY
+                </span>
+
+
+                <div class="metric-values">
+
+                    <strong>
+                        {{ entropy_before }}
+                    </strong>
+
+                    <span>
+                        →
+                    </span>
+
+                    <strong class="after">
+                        {{ entropy_after }}
+                    </strong>
+
+                </div>
+
+
+                <small>
+                    Before → After
+                </small>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <span class="metric-name">
+                    PROCESSING TIME
+                </span>
+
+
+                <div class="metric-values">
+
+                    <strong>
+                        {{ processing_time }}
+                    </strong>
+
+                    <span class="unit">
+                        sec
+                    </span>
+
+                </div>
+
+
+                <small>
+                    Retinex computation
+                </small>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- DOWNLOAD -->
+
+    <div class="download-section">
+
+        <div>
+
+            <h3>
+                Save your enhanced image
+            </h3>
+
+            <p>
+                Download the processed {{ method }} result.
+            </p>
+
+        </div>
+
+
+        <a
+            class="download-button"
+            href="/download/{{ enhanced_image.split('/')[-1] }}"
+        >
+
+            Download Image ↓
+
+        </a>
+
+    </div>
+
+
+</section>
+
+{% endif %}
+
+
+<!-- HOW RETINEX WORKS -->
+
+<section class="method-section">
+
+
+    <div class="section-heading">
+
+        <span class="section-number">
+            04
+        </span>
+
+
+        <div>
+
+            <h2>
+                How Retinex works
+            </h2>
+
+
+            <p>
+                Image formation based on illumination
+                and reflectance.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="retinex-model">
+
+
+        <div class="model-step">
+
+            <div class="model-icon">
+                I
+            </div>
+
+
+            <h3>
+                Observed Image
+            </h3>
+
+
+            <p>
+                Captured low-light image.
+            </p>
+
+        </div>
+
+
+        <div class="model-arrow">
+            →
+        </div>
+
+
+        <div class="model-step">
+
+            <div class="model-icon">
+                L
+            </div>
+
+
+            <h3>
+                Illumination
+            </h3>
+
+
+            <p>
+                Estimated lighting component.
+            </p>
+
+        </div>
+
+
+        <div class="model-arrow">
+            +
+        </div>
+
+
+        <div class="model-step">
+
+            <div class="model-icon">
+                R
+            </div>
+
+
+            <h3>
+                Reflectance
+            </h3>
+
+
+            <p>
+                Scene information independent
+                of illumination.
+            </p>
+
+        </div>
+
+
+        <div class="model-arrow">
+            →
+        </div>
+
+
+        <div class="model-step">
+
+            <div class="model-icon">
+                ✦
+            </div>
+
+
+            <h3>
+                Enhanced Image
+            </h3>
+
+
+            <p>
+                Improved visibility and contrast.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="equations">
+
+
+        <div class="equation-card">
+
+            <span>
+                RETINEX MODEL
+            </span>
+
+
+            <div class="equation">
+                I(x,y) = R(x,y) × L(x,y)
+            </div>
+
+        </div>
+
+
+        <div class="equation-card">
+
+            <span>
+                SSR
+            </span>
+
+
+            <div class="equation">
+                SSR = log(I) − log(Gσ * I)
+            </div>
+
+        </div>
+
+
+        <div class="equation-card">
+
+            <span>
+                MSR
+            </span>
+
+
+            <div class="equation">
+                MSR = Σ wᵢ SSRᵢ
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="method-comparison">
+
+
+        <div class="method-detail">
+
+            <div class="method-tag">
+                SSR
+            </div>
+
+
+            <h3>
+                Single-Scale Retinex
+            </h3>
+
+
+            <p>
+
+                Uses a single Gaussian scale to
+                estimate surrounding illumination
+                and enhance local image structure.
+
+            </p>
+
+        </div>
+
+
+        <div class="method-detail">
+
+            <div class="method-tag">
+                MSR
+            </div>
+
+
+            <h3>
+                Multi-Scale Retinex
+            </h3>
+
+
+            <p>
+
+                Combines responses from multiple
+                Gaussian scales for more balanced
+                illumination enhancement.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+</section>
+
+
+<!-- APPLICATIONS -->
+
+<section class="applications-section">
+
+
+    <div class="section-heading">
+
+        <span class="section-number">
+            05
+        </span>
+
+
+        <div>
+
+            <h2>
+                Applications
+            </h2>
+
+
+            <p>
+                Practical uses of low-light enhancement.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="application-grid">
+
+
+        <div class="application-card">
+
+            <span class="application-number">
+                01
+            </span>
+
+            <h3>
+                Surveillance
+            </h3>
+
+            <p>
+                Improve visibility in poorly illuminated
+                surveillance scenes.
+            </p>
+
+        </div>
+
+
+        <div class="application-card">
+
+            <span class="application-number">
+                02
+            </span>
+
+            <h3>
+                Photography
+            </h3>
+
+            <p>
+                Recover details from underexposed
+                photographs.
+            </p>
+
+        </div>
+
+
+        <div class="application-card">
+
+            <span class="application-number">
+                03
+            </span>
+
+            <h3>
+                Computer Vision
+            </h3>
+
+            <p>
+                Improve image quality before
+                subsequent vision algorithms.
+            </p>
+
+        </div>
+
+
+        <div class="application-card">
+
+            <span class="application-number">
+                04
+            </span>
+
+            <h3>
+                Remote Sensing
+            </h3>
+
+            <p>
+                Enhance scenes affected by
+                difficult illumination conditions.
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<footer>
+
+
+    <div class="footer-logo">
+        RETINEX<span>VISION</span>
+    </div>
+
+
+    <p>
+        Retinex-Based Low-Light Image Enhancement
+    </p>
+
+
+    <p class="reference">
+
+        Based on Jobson, Rahman & Woodell ·
+        IEEE Transactions on Image Processing · 1997
+
+    </p>
+
+
+</footer>
+
+
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
+
+
+</body>
+
+</html>
